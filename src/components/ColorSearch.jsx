@@ -19,8 +19,17 @@ const ColorSearch = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        setSearchResults(data.colors.slice(0, 100)); // Display default colors
-        setColors(data.colors);
+
+        //colors array to include the rgb property
+        const colorsWithRGB = data.colors.map((color) => ({
+          ...color,
+          rgb: hexToRgb(color.hex),
+        }));
+
+        setSearchResults(colorsWithRGB.slice(0, 100)); // Display default colors
+        // setColors(data.colors);
+        setColors(colorsWithRGB);
+        console.log(colorsWithRGB)
       } else {
         setFetchError(true);
       }
@@ -28,6 +37,21 @@ const ColorSearch = () => {
       setFetchError(true);
     }
   };
+
+
+  const hexToRgb = (hex) => {
+    // Remove the hash symbol if it exists
+    hex = hex.replace(/^#/, '');
+
+    // Parse the hexadecimal value to separate RGB values
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
 
   const handleSearch = () => {
     setErrorMessage('');
@@ -121,6 +145,7 @@ const ColorSearch = () => {
             <th>Name</th>
             <th>Hex</th>
             <th>RGB</th>
+            <th>Color</th>
           </tr>
         </thead>
         <tbody>
@@ -129,7 +154,8 @@ const ColorSearch = () => {
             <tr key={color.color}>
               <td>{color.color}</td>
               <td>{color.hex}</td>
-              <td style={{backgroundColor:color.hex}}>{color.rgb}</td>
+              <td>{color.rgb}</td>
+              <td style={{backgroundColor:color.hex}}></td>
             </tr>
           ))}
           
